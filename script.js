@@ -1,5 +1,5 @@
 // ============================
-// Smooth scroll for Nav bar
+//       Navigation bar
 // ============================
 window.addEventListener("scroll", () => {
   const navbar = document.querySelector(".navbar");
@@ -7,6 +7,23 @@ window.addEventListener("scroll", () => {
     navbar.classList.add("scrolled");
   } else {
     navbar.classList.remove("scrolled");
+  }
+});
+
+// Mobile Menu Toggle
+const menuToggle = document.getElementById("menu-toggle");
+const navMenu = document.getElementById("nav-menu");
+
+menuToggle.addEventListener("click", () => {
+  navMenu.classList.toggle("open");
+  menuToggle.classList.toggle("rotated");
+
+  // Toggle icon between bars and close
+  const icon = menuToggle.querySelector("i");
+  if (navMenu.classList.contains("open")) {
+    icon.classList.replace("fa-bars", "fa-times");
+  } else {
+    icon.classList.replace("fa-times", "fa-bars");
   }
 });
 
