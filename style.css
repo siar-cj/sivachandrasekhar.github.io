@@ -145,10 +145,16 @@ nav ul li a:hover {
   transform: rotate(90deg);
 }
 
-/* Mobile Responsive */
+/*                 MOBILE RESPONSIVE                     */
 @media (max-width: 768px) {
+  /* Show the toggle beside the logo */
   .menu-toggle {
     display: block;
+  }
+
+  /* Prevent default nav from showing */
+  #nav-menu {
+    display: none !important; /* <-- This hides the full menu in mobile view */
   }
 
   .navbar {
@@ -164,13 +170,13 @@ nav ul li a:hover {
     margin-left: auto;
   }
 
-  /* Side Dropdown (Not full width) */
-  #nav-menu {
-    display: none;
+  /* Side Dropdown (Appears only when toggled) */
+  #nav-menu.open {
+    display: block !important;
     position: absolute;
     top: 100%;
     right: 2rem;
-    width: 220px; /* narrower width */
+    width: 220px;
     background: rgba(22, 27, 34, 0.95);
     border: 1px solid rgba(255, 153, 0, 0.3);
     border-radius: 10px;
@@ -178,10 +184,6 @@ nav ul li a:hover {
     text-align: left;
     box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
     animation: slideDown 0.3s ease;
-  }
-
-  #nav-menu.open {
-    display: block;
   }
 
   nav ul {
