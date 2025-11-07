@@ -476,8 +476,77 @@ h2 { color: #ff9900; margin-bottom: 1.2rem; }
   opacity:0.3;
 }
 
-/* Footer */
-footer { text-align:center; padding:1.5rem; background:#161b22; color:#a3a3a3; font-size:0.9rem; }
+/* Footer — elegant golden touch (overrides previous footer rules) */
+footer {
+  text-align: center;
+  padding: 36px 22px;
+  background: linear-gradient(180deg, #05060a 0%, #071018 60%, #081219 100%);
+  color: #c9d9ec;
+  font-size: 0.95rem;
+  border-top: 1px solid rgba(255,215,138,0.06);
+  box-shadow: 0 -10px 48px rgba(2,6,12,0.6) inset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px) saturate(120%);
+  position: relative;
+  z-index: 100;
+  overflow: visible;
+}
+
+footer p {
+  margin: 0;
+  width: 100%;
+  max-width: 920px;
+  color: #d6e8fb;
+  line-height: 1.45;
+  letter-spacing: 0.2px;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+/* subtle golden underline glow */
+footer::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  width: 56%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255,215,138,0) 0%, rgba(255,215,138,0.28) 45%, rgba(255,215,138,0.6) 50%, rgba(255,215,138,0.28) 55%, rgba(255,215,138,0) 100%);
+  box-shadow: 0 6px 24px rgba(255,183,66,0.06);
+  pointer-events: none;
+  opacity: 0.98;
+}
+
+/* emphasize brand text if wrapped in em or strong (no HTML change required) */
+footer em, footer strong {
+  color: #ffd78a;
+  font-style: normal;
+  font-weight: 700;
+  text-shadow: 0 6px 18px rgba(255,183,66,0.04);
+}
+
+/* hover/focus micro-interaction */
+footer:hover::after,
+footer:focus-within::after {
+  transform: translateX(-50%) scaleX(1.02);
+  transition: transform 220ms ease, opacity 220ms ease;
+}
+
+/* responsive */
+@media (max-width: 480px) {
+  footer { padding: 20px 12px; font-size: 0.88rem; }
+  footer::after { width: 86%; bottom: 8px; height: 1.6px; }
+  footer p { line-height: 1.35; }
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  footer, footer::after { transition: none; }
+}
 
 /* Cursor piece */
 .cursor-piece {
@@ -507,3 +576,71 @@ footer { text-align:center; padding:1.5rem; background:#161b22; color:#a3a3a3; f
 /* Scroll reveal default */
 section, .project-card { opacity: 0; transform: translateY(30px); transition: opacity 1s ease-out, transform 1s ease-out; }
 section.visible, .project-card.visible { opacity: 1; transform: translateY(0); }
+
+/* Back to Top (fancy, ultra-modern) */
+.back-to-top {
+  position: fixed;
+  right: 22px;
+  bottom: 28px;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  border: none;
+  display: inline-grid;
+  place-items: center;
+  background: linear-gradient(135deg, rgba(255,153,0,0.12), rgba(255,153,0,0.06));
+  color: #0d1117;
+  backdrop-filter: blur(8px) saturate(140%);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.03);
+  transform: translateY(20px) scale(.98);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform .36s cubic-bezier(.2,.9,.3,1), opacity .28s ease, box-shadow .2s ease;
+  cursor: pointer;
+  z-index: 99999;
+}
+.back-to-top svg { color: #0d1117; filter: drop-shadow(0 1px 0 rgba(255,255,255,0.03)); }
+.back-to-top .ripple {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: radial-gradient(circle at 30% 30%, rgba(255,204,102,0.14), rgba(255,204,102,0.03) 40%, transparent 60%);
+  opacity: 0;
+  transform: scale(.9);
+  transition: opacity .35s ease, transform .45s cubic-bezier(.2,.9,.3,1);
+  pointer-events: none;
+}
+.back-to-top.show {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+.back-to-top.show .ripple {
+  opacity: 1;
+  transform: scale(1);
+  animation: btt-pulse 2.6s infinite ease-in-out;
+}
+.back-to-top:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.6);
+}
+.back-to-top:focus { outline: none; box-shadow: 0 0 0 6px rgba(255,153,0,0.12); border-radius:14px; }
+
+/* pulse */
+@keyframes btt-pulse {
+  0% { transform: scale(0.95); opacity: 0.9; }
+  50% { transform: scale(1.05); opacity: 0.45; }
+  100% { transform: scale(0.95); opacity: 0.9; }
+}
+
+/* smaller on mobile */
+@media (max-width: 520px) {
+  .back-to-top { right: 14px; bottom: 18px; width: 48px; height: 48px; border-radius:12px; }
+  .back-to-top .ripple { width:38px; height:38px; border-radius:10px; }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .back-to-top, .back-to-top .ripple { transition: none !important; animation: none !important; }
+}

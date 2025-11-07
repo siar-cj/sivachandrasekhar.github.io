@@ -263,4 +263,153 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     initSkillsArrows();
+
+    // --------------------------
+    // Back to Top button
+    // --------------------------
+    (function initBackToTop() {
+        const btn = document.getElementById("back-to-top");
+        if (!btn) return;
+
+        const SHOW_AT = 300;
+        const prefersReduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        function update() {
+            if (window.scrollY > SHOW_AT) {
+                btn.classList.add("show");
+                btn.setAttribute("aria-hidden", "false");
+            } else {
+                btn.classList.remove("show");
+                btn.setAttribute("aria-hidden", "true");
+            }
+        }
+
+        // initial state
+        update();
+
+        // listeners
+        window.addEventListener("scroll", update, { passive: true });
+        window.addEventListener("resize", update);
+
+        btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (prefersReduced) {
+                window.scrollTo(0, 0);
+            } else {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+            btn.blur();
+        });
+
+        // keyboard activation (Enter/Space)
+        btn.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                btn.click();
+            }
+        });
+
+        // make button focusable for keyboard users
+        btn.tabIndex = 0;
+    })();
+
+    // --------------------------
+    // Chessboard animation (SVG + GSAP)
+    // --------------------------
+    const board = document.getElementById("chessboard");
+    const piecesLayer = document.getElementById("chess-pieces");
+    const paths = document.querySelectorAll(".path");
+    const pathMeta = Array.from(paths).map((p) => ({
+        el: p,
+        length: p.getTotalLength()
+    }));
+
+    // hide all pieces initially
+    gsap.set(".piece", { opacity: 0 });
+
+    // reveal the board and paths with a simple wipe animation
+    gsap.fromTo(board, { autoAlpha: 0 }, { duration: 1, autoAlpha: 1 });
+    gsap.fromTo(paths, { strokeDashoffset: 100 }, { duration: 1, strokeDashoffset: 0, stagger: 0.1 });
+
+    // --------------------------
+    // Piece animations
+    // --------------------------
+    // create an SVG use element referencing the pawn symbol
+    function makePieceElement(color = "#ffd78a") {
+        const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+        use.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#piece-pawn");
+        use.setAttribute("class", "piece-breath");
+        use.setAttribute("width", "28");
+        use.setAttribute("height", "28");
+        use.setAttribute("x", "0");
+        use.setAttribute("y", "0");
+        use.style.fill = color;
+        use.style.stroke = "rgba(0,0,0,0.06)";
+        // quicker visual feedback if supported
+        use.style.opacity = "0.98";
+        return use;
+    }
+
+    // piece factory (tweaked for snappier motion & smaller visuals)
+    function createPieceOnPath(pathIndex, startT = 0, speed = 0.02, tint = "#ffd78a") {
+        const pathEl = pathMeta[pathIndex].el;
+        const pieceEl = makePieceElement(tint);
+        piecesLayer.appendChild(pieceEl);
+
+        const piece = {
+            el: pieceEl,
+            pathEl,
+            pathIndex,
+            // cluster initial positions a bit so they appear together
+            t: startT + (Math.random() - 0.5) * 0.02,
+            // increase base speed so motion feels snappier
+            speed: speed * (1.8 + Math.random() * 0.6),
+            x: 0,
+            y: 0,
+            vx: 0,
+            vy: 0,
+            rotation: 0,
+            vr: 0,
+            // stiffer springs -> faster settle; slightly higher damping to avoid overshoot
+            stiffness: (260 + Math.random() * 120) * 1.6,
+            damping: (18 + Math.random() * 8) * 1.05,
+            // make pieces smaller so more appear on screen simultaneously
+            size: (0.9 + Math.random() * 0.25) * 0.76,
+            targetScale: 1.0,
+            alive: true
+        };
+
+        // initial placement
+        const pt = pathPoint(pathEl, piece.t);
+        piece.x = pt.x; piece.y = pt.y; piece.rotation = pt.angle;
+        piece.el.setAttribute("transform", `translate(${piece.x - 14}, ${piece.y - 14}) rotate(${(piece.rotation * 180/Math.PI).toFixed(2)},14,14) scale(${piece.size})`);
+
+        // click to pause/resume
+        piece.el.addEventListener("click", (e) => {
+            piece.paused = !piece.paused;
+            piece.el.style.opacity = piece.paused ? 0.5 : 0.98;
+        });
+
+        return piece;
+    }
+
+    // pieces array
+    const pieces = [];
+    // spawn a few pieces across the three paths with varied timings (smaller + faster)
+    pieces.push(createPieceOnPath(0, 0.02, 0.06, "#ffd78a")); // commit
+    pieces.push(createPieceOnPath(0, 0.35, 0.05, "#ffd78a"));
+    pieces.push(createPieceOnPath(1, 0.05, 0.045, "#ffcc66")); // build
+    pieces.push(createPieceOnPath(2, 0.12, 0.055, "#ffc77d")); // test
+    pieces.push(createPieceOnPath(1, 0.7, 0.04, "#ffd78a"));
+
+    // quick "fast-launch" burst so pieces move into place immediately (user won't wait)
+    (function fastLaunchBurst() {
+        const saved = pieces.map(p => p.speed);
+        // briefly accelerate all pieces
+        pieces.forEach(p => p.speed = Math.max(0.08, p.speed * 3.0));
+        // after short burst, restore more moderate speeds
+        setTimeout(() => {
+            pieces.forEach((p, i) => p.speed = saved[i] * 1.25); // slightly faster than original
+        }, 360); // 300-420ms feels snappy
+    })();
 });
