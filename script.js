@@ -178,6 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
         { selector: "#vision", img: "assets/images/chess/knight.png" },
         { selector: "#experience", img: "assets/images/chess/bishop.png" },
         { selector: "#skills", img: "assets/images/chess/rook.png" },
+        { selector: "#education", img: "assets/images/chess/queen.png" },
         { selector: "#projects", img: "assets/images/chess/rook.png" },
         { selector: "#contact", img: "assets/images/chess/pawn.png" },
     ];
